@@ -86,9 +86,15 @@ class PyGrid(object):
     def _bind_keys(self):
         """ Bind keys from config """
         config = self._get_config()
-        for key, command in config['keys']['commands'].items():
-            # See https://developer.gnome.org/gtk3/stable/gtk3-Keyboard-Accelerators.html#gtk-accelerator-parse
-            keysym, modmask = Gtk.accelerator_parse(config['keys']['accelerator'] + key)
+        if (isinstance(config['keys'], list)):
+            for keys in config['keys']:
+                self._do_bind_keys(keys)
+        else:
+            self._do_bind_keys(config['keys'])
+
+    def _do_bind_keys(self, keys):
+        for key, command in keys['commands'].items():
+            keysym, modmask = Gtk.accelerator_parse(keys['accelerator'] + key)
             keycode = self.display.keysym_to_keycode(keysym)
 
             self.keys[keycode] = command
